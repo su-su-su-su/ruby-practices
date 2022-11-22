@@ -8,12 +8,7 @@ def options
 end
 
 def directory
-  case options['a']
-  when true
-    Dir.glob('*', File::FNM_DOTMATCH)
-  when false
-    Dir.glob('*')
-  end
+  Dir.glob('*', options['a'] ? File::FNM_DOTMATCH : 0)
 end
 
 def row_legth
