@@ -4,11 +4,12 @@
 require 'optparse'
 
 def options
-  ARGV.getopts('a')
+  ARGV.getopts('r')
 end
 
 def directory
-  Dir.glob('*', options['a'] ? File::FNM_DOTMATCH : 0)
+  d = Dir.glob('*')
+  options['r'] ? d.sort.reverse : d
 end
 
 def row_legth
