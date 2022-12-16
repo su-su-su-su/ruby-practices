@@ -9,7 +9,7 @@ end
 
 def directory
   d = Dir.glob('*')
-  options['r'] ? d.sort.reverse : d
+  options['r'] ? d.reverse : d
 end
 
 def row_legth
