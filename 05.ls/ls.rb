@@ -2,14 +2,18 @@
 # frozen_string_literal: true
 
 require 'optparse'
+require 'etc'
 
 def options
-  ARGV.getopts('r')
+  ARGV.getopts('l')
 end
 
 def directory
-  d = Dir.glob('*')
-  options['r'] ? d.reverse : d
+  Dir.glob('*')
+end
+
+def option_type
+  options['l'] ? option_l : sort_by
 end
 
 def row_legth
@@ -34,4 +38,55 @@ def sort_by
   end
 end
 
-sort_by
+def file_details
+  directory.map do |d|
+    File::Stat.new(d)
+  end
+end
+
+def files_blocks
+  file_details.map(&:blocks)
+end
+
+def file_types(file_type)
+  {
+    'file' => '-',
+    'directory' => 'd',
+    'characterSpecial' => 'c',
+    'blockSpecial' => 'b',
+    'fifo' => 'p',
+    'link' => 'l',
+    'socket' => 's'
+  }[file_type]
+end
+
+def permissions(permission)
+  {
+    '0' => '---',
+    '1' => '--x',
+    '2' => '-w-',
+    '3' => '-wx',
+    '4' => 'r--',
+    '5' => 'r-x',
+    '6' => 'rw-',
+    '7' => 'rwx'
+  }[permission]
+end
+
+def option_l
+  puts "totel #{files_blocks.sum}"
+  directory.each do |x|
+    fs = File::Stat.new(x)
+    fill = fs.mode.to_s(8)
+    print file_types(fs.ftype)
+    print permissions(fill[-3]) + permissions(fill[-2]) + permissions(fill[-1])
+    print fs.nlink.to_s.rjust(2)
+    print Etc.getpwuid(File.stat(x).uid).name.rjust(7)
+    print Etc.getpwuid(File.stat(x).gid).name.rjust(7)
+    print fs.size.to_s.rjust(5)
+    print fs.mtime.strftime('%b %e %H:%M').to_s.rjust(13)
+    puts " #{x}"
+  end
+end
+
+option_type
