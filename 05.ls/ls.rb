@@ -12,8 +12,8 @@ def directory
   Dir.glob('*')
 end
 
-def option_type
-  options['l'] ? option_l : no_option
+def print_ls
+  options['l'] ? print_file_details : print_files_in_columns
 end
 
 def row_legth
@@ -30,7 +30,7 @@ def insert_blank
   end
 end
 
-def no_option
+def print_files_in_columns
   name = insert_blank.each_slice(row_legth).to_a
   name[0].zip(*(name[1..nil])) do |i|
     print i.join
@@ -73,7 +73,7 @@ def permissions(permission)
   }[permission]
 end
 
-def option_l
+def print_file_details
   puts "total #{files_blocks.sum}"
   directory.each do |x|
     fs = File::Stat.new(x)
@@ -89,4 +89,4 @@ def option_l
   end
 end
 
-option_type
+print_ls
