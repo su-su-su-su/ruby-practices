@@ -1,51 +1,38 @@
-#!/usr/bin/env ruby
+# !/usr/bin/env ruby
 # frozen_string_literal: true
 
 require 'optparse'
 require 'etc'
+require 'debug'
 
 def options
-  ARGV.getopts('l')
-end
-
-def directory
-  Dir.glob('*')
+  ARGV.getopts('alr')
 end
 
 def print_ls
-  options['l'] ? print_file_details : print_files_in_columns
+  opt = options
+  dir = Dir.glob('*', opt['a'] ? File::FNM_DOTMATCH : 0)
+  dir = dir.reverse if opt['r']
+  return print_file_details(dir) if opt['l']
+
+  insert_blank(dir)
 end
 
-def row_legth
-  (directory.size / 3.to_f).ceil # 出力の行数を指定
-end
-
-def directory_max_legth
-  directory.map(&:length).max # ファイルの最大の文字数を出すend
-end
-
-def insert_blank
-  directory.map do |file|
+def insert_blank(dir)
+  row_legth = (dir.size / 3.to_f).ceil # 出力の行数を指定
+  directory_max_legth = dir.map(&:length).max
+  add_10_spaces = dir.map do |file|
     file.ljust(directory_max_legth + 10)
   end
+  print_files_in_columns(add_10_spaces, row_legth)
 end
 
-def print_files_in_columns
-  name = insert_blank.each_slice(row_legth).to_a
+def print_files_in_columns(add_10_spaces, row_legth)
+  name = add_10_spaces.each_slice(row_legth).to_a
   name[0].zip(*(name[1..nil])) do |i|
     print i.join
     puts
   end
-end
-
-def file_details
-  directory.map do |d|
-    File::Stat.new(d)
-  end
-end
-
-def files_blocks
-  file_details.map(&:blocks)
 end
 
 def file_types(file_type)
@@ -73,9 +60,13 @@ def permissions(permission)
   }[permission]
 end
 
-def print_file_details
+def print_file_details(dir)
+  file_details = dir.map do |d|
+    File::Stat.new(d)
+  end
+  files_blocks = file_details.map(&:blocks)
   puts "total #{files_blocks.sum}"
-  directory.each do |x|
+  dir.each do |x|
     fs = File::Stat.new(x)
     fill = fs.mode.to_s(8)
     print file_types(fs.ftype.to_sym)
