@@ -1,9 +1,8 @@
-# !/usr/bin/env ruby
+#!/usr/bin/env ruby
 # frozen_string_literal: true
 
 require 'optparse'
 require 'etc'
-require 'debug'
 
 def options
   ARGV.getopts('alr')
@@ -15,20 +14,28 @@ def print_ls
   dir = dir.reverse if opt['r']
   return print_file_details(dir) if opt['l']
 
-  insert_blank(dir)
+  row_legth(dir)
 end
 
-def insert_blank(dir)
-  row_legth = (dir.size / 3.to_f).ceil # 出力の行数を指定
-  directory_max_legth = dir.map(&:length).max
-  add_10_spaces = dir.map do |file|
-    file.ljust(directory_max_legth + 10)
+def row_legth(dir)
+  row = (dir.size / 3.to_f).ceil # 出力の行数を指定
+  directory_max_legth(dir, row)
+end
+
+def directory_max_legth(dir, row)
+  max = dir.map(&:length).max # ファイルの最大の文字数を出すend
+  insert_blank(dir, row, max)
+end
+
+def insert_blank(dir, row, max)
+  blank = dir.map do |file|
+    file.ljust(max + 10)
   end
-  print_files_in_columns(add_10_spaces, row_legth)
+  print_files_in_columns(row, blank)
 end
 
-def print_files_in_columns(add_10_spaces, row_legth)
-  name = add_10_spaces.each_slice(row_legth).to_a
+def print_files_in_columns(row, blank)
+  name = blank.each_slice(row).to_a
   name[0].zip(*(name[1..nil])) do |i|
     print i.join
     puts
