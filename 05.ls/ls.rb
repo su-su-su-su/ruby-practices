@@ -14,27 +14,27 @@ def print_ls
   dir = dir.reverse if opt['r']
   return print_file_details(dir) if opt['l']
 
-  row_legth(dir)
+  directory_max_length(dir)
 end
 
-def row_legth(dir)
-  row = (dir.size / 3.to_f).ceil # 出力の行数を指定
-  directory_max_legth(dir, row)
+def directory_max_length(dir)
+  max = dir.map(&:length).max # ファイルの最大の文字数を出す
+  insert_blank(dir, max)
 end
 
-def directory_max_legth(dir, row)
-  max = dir.map(&:length).max # ファイルの最大の文字数を出すend
-  insert_blank(dir, row, max)
-end
-
-def insert_blank(dir, row, max)
+def insert_blank(dir, max)
   blank = dir.map do |file|
     file.ljust(max + 10)
   end
-  print_files_in_columns(row, blank)
+  print_value_obtained(dir, blank)
 end
 
-def print_files_in_columns(row, blank)
+def print_value_obtained(dir, blank)
+  row = (dir.size / 3.to_f).ceil # 出力の行数を指定
+  print_files_in_columns(blank, row)
+end
+
+def print_files_in_columns(blank, row)
   name = blank.each_slice(row).to_a
   name[0].zip(*(name[1..nil])) do |i|
     print i.join
