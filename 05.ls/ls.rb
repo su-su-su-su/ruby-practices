@@ -14,28 +14,22 @@ def print_ls
   dir = dir.reverse if opt['r']
   return print_file_details(dir) if opt['l']
 
-  directory_max_length(dir)
+  print_files_in_columns(dir)
 end
 
-def directory_max_length(dir)
-  max = dir.map(&:length).max # ファイルの最大の文字数を出す
-  insert_blank(dir, max)
+def row_legth(directory)
+  (directory.size / 3.to_f).ceil # 出力の行数を指定
 end
 
-def insert_blank(dir, max)
-  blank = dir.map do |file|
-    file.ljust(max + 10)
+def insert_blank(directory)
+  directory_max_length = directory.map(&:length).max # ファイルの最大の文字数を出す
+  directory.map do |file|
+    file.ljust(directory_max_length + 10)
   end
-  print_value_obtained(dir, blank)
 end
 
-def print_value_obtained(dir, blank)
-  row = (dir.size / 3.to_f).ceil # 出力の行数を指定
-  print_files_in_columns(blank, row)
-end
-
-def print_files_in_columns(blank, row)
-  name = blank.each_slice(row).to_a
+def print_files_in_columns(directory)
+  name = insert_blank(directory).each_slice(row_legth(directory)).to_a
   name[0].zip(*(name[1..nil])) do |i|
     print i.join
     puts
@@ -67,13 +61,13 @@ def permissions(permission)
   }[permission]
 end
 
-def print_file_details(dir)
-  file_details = dir.map do |d|
+def print_file_details(directory)
+  file_details = directory.map do |d|
     File::Stat.new(d)
   end
   files_blocks = file_details.map(&:blocks)
   puts "total #{files_blocks.sum}"
-  dir.each do |x|
+  directory.each do |x|
     fs = File::Stat.new(x)
     fill = fs.mode.to_s(8)
     print file_types(fs.ftype.to_sym)
