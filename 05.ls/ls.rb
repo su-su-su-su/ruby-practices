@@ -5,47 +5,35 @@ require 'optparse'
 require 'etc'
 
 def options
-  ARGV.getopts('l')
-end
-
-def directory
-  Dir.glob('*')
+  ARGV.getopts('alr')
 end
 
 def print_ls
-  options['l'] ? print_file_details : print_files_in_columns
+  opt = options
+  dir = Dir.glob('*', opt['a'] ? File::FNM_DOTMATCH : 0)
+  dir = dir.reverse if opt['r']
+  return print_file_details(dir) if opt['l']
+
+  print_files_in_columns(dir)
 end
 
-def row_legth
+def row_legth(directory)
   (directory.size / 3.to_f).ceil # 出力の行数を指定
 end
 
-def directory_max_legth
-  directory.map(&:length).max # ファイルの最大の文字数を出すend
-end
-
-def insert_blank
+def insert_blank(directory)
+  directory_max_length = directory.map(&:length).max # ファイルの最大の文字数を出す
   directory.map do |file|
-    file.ljust(directory_max_legth + 10)
+    file.ljust(directory_max_length + 10)
   end
 end
 
-def print_files_in_columns
-  name = insert_blank.each_slice(row_legth).to_a
+def print_files_in_columns(directory)
+  name = insert_blank(directory).each_slice(row_legth(directory)).to_a
   name[0].zip(*(name[1..nil])) do |i|
     print i.join
     puts
   end
-end
-
-def file_details
-  directory.map do |d|
-    File::Stat.new(d)
-  end
-end
-
-def files_blocks
-  file_details.map(&:blocks)
 end
 
 def file_types(file_type)
@@ -73,7 +61,11 @@ def permissions(permission)
   }[permission]
 end
 
-def print_file_details
+def print_file_details(directory)
+  file_details = directory.map do |d|
+    File::Stat.new(d)
+  end
+  files_blocks = file_details.map(&:blocks)
   puts "total #{files_blocks.sum}"
   directory.each do |x|
     fs = File::Stat.new(x)
