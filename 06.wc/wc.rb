@@ -36,14 +36,16 @@ def process_input(file_path = nil)
 end
 
 def print_file_data(options, line_count, word_count, byte_count, file_path)
+  l_c = line_count.to_s.rjust(4)
+  w_c = word_count.to_s.rjust(5)
+  b_c = byte_count.to_s.rjust(5)
+
   if options.any?
-    print line_count.to_s.rjust(4) if options[:lines]
-    print word_count.to_s.rjust(5) if options[:words]
-    print byte_count.to_s.rjust(5) if options[:bytes]
+    print l_c if options[:lines]
+    print w_c if options[:words]
+    print b_c if options[:bytes]
   else
-    print line_count.to_s.rjust(4)
-    print word_count.to_s.rjust(5)
-    print byte_count.to_s.rjust(5)
+    print l_c + w_c + b_c
   end
   puts " #{file_path}"
 end
