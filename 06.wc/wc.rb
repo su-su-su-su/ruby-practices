@@ -5,7 +5,7 @@ require 'optparse'
 def print_count
   options = parse_options
   file_paths = ARGV
-  file_data = $stdin.tty? ? file_paths.map { |fp| process_file(fp) } : [process_piped_input]
+  file_data = file_paths.empty? ? [process_input] : file_paths.map { |fp| process_input(fp) }
   file_paths = [''] if file_paths.empty?
   print_results(options, file_data, file_paths)
 end
@@ -30,31 +30,33 @@ def parse_options
   options
 end
 
-def process_file(file_path)
-  contents = File.read(file_path)
-  [contents.count("\n"), contents.split.size, contents.bytesize]
-end
-
-def process_piped_input
-  contents = $stdin.read
+def process_input(file_path = nil)
+  contents = file_path ? File.read(file_path) : $stdin.read
   [contents.count("\n"), contents.split.size, contents.bytesize]
 end
 
 def print_file_data(options, line_count, word_count, byte_count, file_path)
-  print line_count.to_s.rjust(4) if options[:lines] || options.empty?
-  print word_count.to_s.rjust(5) if options[:words] || options.empty?
-  print byte_count.to_s.rjust(5) if options[:bytes] || options.empty?
+  if options.any?
+    print line_count.to_s.rjust(4) if options[:lines]
+    print word_count.to_s.rjust(5) if options[:words]
+    print byte_count.to_s.rjust(5) if options[:bytes]
+  else
+    print line_count.to_s.rjust(4)
+    print word_count.to_s.rjust(5)
+    print byte_count.to_s.rjust(5)
+  end
   puts " #{file_path}"
 end
 
 def print_totals(options, total)
+  line_count, word_count, byte_count = total
   if options.any?
-    print total[0].to_s.rjust(5) if options[:lines]
-    print total[1].to_s.rjust(5) if options[:words]
-    print total[2].to_s.rjust(5) if options[:bytes]
+    print line_count.to_s.rjust(5) if options[:lines]
+    print word_count.to_s.rjust(5) if options[:words]
+    print byte_count.to_s.rjust(5) if options[:bytes]
     puts ' total'
   else
-    puts "  #{total[0]}  #{total[1]}  #{total[2]}  total"
+    puts "  #{line_count}  #{word_count}  #{byte_count}  total"
   end
 end
 
