@@ -5,17 +5,16 @@ require 'optparse'
 def print_count
   options = parse_options
   file_paths = ARGV
-  file_data = file_paths.empty? ? [process_input] : file_paths.map { |fp| process_input(fp) }
-  file_paths = [''] if file_paths.empty?
-  print_results(options, file_data, file_paths)
+  file_info = file_paths.empty? ? { '' => process_input($stdin) } : file_paths.map { |fp| [fp, process_input(File.open(fp))] }.to_h
+  print_results(options, file_info)
 end
 
-def print_results(options, file_data, file_paths)
-  total = file_data.transpose.map(&:sum)
-  file_paths.zip(file_data).each do |file_path, counts|
+def print_results(options, file_info)
+  total = file_info.values.transpose.map(&:sum)
+  file_info.each do |file_path, counts|
     print_file_data(options, *counts, file_path)
   end
-  return unless file_paths.size >= 2
+  return unless file_info.size >= 2
 
   print_totals(options, total)
 end
@@ -30,8 +29,8 @@ def parse_options
   options
 end
 
-def process_input(file_path = nil)
-  contents = file_path ? File.read(file_path) : $stdin.read
+def process_input(input)
+  contents = input.read
   [contents.count("\n"), contents.split.size, contents.bytesize]
 end
 
@@ -45,14 +44,11 @@ end
 
 def print_totals(options, total)
   line_count, word_count, byte_count = total
-  if options.any?
-    print line_count.to_s.rjust(5) if options[:lines]
-    print word_count.to_s.rjust(5) if options[:words]
-    print byte_count.to_s.rjust(5) if options[:bytes]
-    puts ' total'
-  else
-    puts "  #{line_count}  #{word_count}  #{byte_count}  total"
-  end
+  options = { lines: true, words: true, bytes: true } if options.empty?
+  print line_count.to_s.rjust(5) if options[:lines]
+  print word_count.to_s.rjust(5) if options[:words]
+  print byte_count.to_s.rjust(5) if options[:bytes]
+  puts ' total'
 end
 
 print_count
