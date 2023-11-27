@@ -35,7 +35,7 @@ class Game
                  10
                elsif frame.strike?
                  frame.calculate_strike_score(next_frame, next_next_frame)
-               elsif frame.spear?
+               elsif frame.spare?
                  frame.calculate_spare_score(next_frame)
                else
                  frame.score

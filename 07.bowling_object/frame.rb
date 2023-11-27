@@ -14,7 +14,7 @@ class Frame
     @first_shot.point == 10
   end
 
-  def spear?
+  def spare?
     !strike? && score == 10
   end
 
@@ -31,7 +31,7 @@ class Frame
   end
 
   def calculate_spare_score(next_frame)
-    return unless spear?
+    return unless spare?
 
     (next_frame.first_shot.point + score)
   end
