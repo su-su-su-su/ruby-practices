@@ -11,15 +11,15 @@ class Game
     shots = []
     frame = []
     @shots.each do |s|
-      s = s.to_i unless s == 'X'
-      if s == 'X'
-        frame << Frame.new([s])
-      else
+      if s != 'X'
+        s = s.to_i
         shots << s
         next if shots.size == 1 && shots[0] <= 9
 
         frame << Frame.new(shots)
         shots = []
+      else
+        frame << Frame.new([s])
       end
     end
     frame
