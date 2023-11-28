@@ -27,16 +27,15 @@ class Game
 
   def print_scores
     point = 0
-    group_frames.each_with_index do |frame, i|
-      next_frame = group_frames[i + 1]
-      next_next_frame = group_frames[i + 2]
+    group_frames.each_with_index do |frame, index|
+      last_shot = @shots.last.to_i
+      next_frame = group_frames[index + 1]
+      next_next_frame = group_frames[index + 2]
 
-      point += if i >= 9 && frame.strike?
-                 10
-               elsif frame.strike?
-                 frame.calculate_strike_score(next_frame, next_next_frame)
+      point += if frame.strike?
+                 frame.calculate_strike_score(last_shot, index, next_frame, next_next_frame)
                elsif frame.spare?
-                 frame.calculate_spare_score(next_frame)
+                 frame.calculate_spare_score(last_shot, index, next_frame)
                else
                  frame.score
                end

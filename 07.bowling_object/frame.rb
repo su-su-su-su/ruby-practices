@@ -22,17 +22,23 @@ class Frame
     [first_shot.point, second_shot.point].sum
   end
 
-  def calculate_strike_score(next_frame, next_next_frame)
-    if strike? && next_frame.first_shot.point == 10
+  def calculate_strike_score(last_shot, index, next_frame = nil, next_next_frame = nil)
+    if [9, 11].include?(index)
+      score
+    elsif index == 10
+      (score + last_shot)
+    elsif strike? && next_frame.first_shot.point == 10
       (next_frame.score + next_next_frame.first_shot.point + score)
     elsif strike?
       (next_frame.score + score)
     end
   end
 
-  def calculate_spare_score(next_frame)
-    return unless spare?
-
-    (next_frame.first_shot.point + score)
+  def calculate_spare_score(last_shot, index, next_frame = nil)
+    if index == 9
+      (score + last_shot)
+    else
+      (next_frame.first_shot.point + score)
+    end
   end
 end
