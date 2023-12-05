@@ -9,33 +9,39 @@ class Game
 
   def group_frames
     shots = []
-    frame = []
+    frames = []
     @shots.each do |s|
       if s != 'X'
         s = s.to_i
         shots << s
         next if shots.size == 1 && shots[0] <= 9
+        next if frames.size == 9 && shots.size == 2 && (shots[0].to_i + shots[1].to_i == 10 || shots[0] == 'X')
 
-        frame << Frame.new(shots)
+        frames << Frame.new(shots)
         shots = []
+      elsif frames.size == 9 && shots.size <= 2
+        shots << s
+        if shots.size == 3
+          shots << s
+          frames << Frame.new(shots)
+        end
       else
-        frame << Frame.new([s])
+        frames << Frame.new([s])
       end
     end
-    frame
+    frames
   end
 
   def print_scores
     point = 0
     group_frames.each_with_index do |frame, index|
-      last_shot = @shots.last.to_i
       next_frame = group_frames[index + 1]
       next_next_frame = group_frames[index + 2]
 
       point += if frame.strike?
-                 frame.calculate_strike_score(last_shot, index, next_frame, next_next_frame)
+                 frame.calculate_strike_score(index, next_frame, next_next_frame)
                elsif frame.spare?
-                 frame.calculate_spare_score(last_shot, index, next_frame)
+                 frame.calculate_spare_score(index, next_frame)
                else
                  frame.score
                end
@@ -45,5 +51,7 @@ class Game
 end
 
 shots = ARGV[0].split(',')
+
 game = Game.new(shots)
+
 game.print_scores
