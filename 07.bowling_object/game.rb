@@ -14,11 +14,8 @@ class Game
       if s != 'X'
         s = s.to_i
         shots << s
-        next if shots.size == 1 && shots[0] <= 9
-        next if frames.size == 9 && shots.size == 2 && (shots[0].to_i + shots[1].to_i == 10 || shots[0] == 'X')
+        handle_shot(shots, frames)
 
-        frames << Frame.new(shots)
-        shots = []
       elsif frames.size == 9 && shots.size <= 2
         shots << s
         if shots.size == 3
@@ -30,6 +27,26 @@ class Game
       end
     end
     frames
+  end
+
+  def handle_shot(shots, frames)
+    if frames.size == 9 && shots.size == 2
+      handle_final_frame(shots, frames)
+    elsif shots.size == 1 && shots[0] <= 9
+      nil
+    else
+      frames << Frame.new(shots)
+      shots.clear
+    end
+  end
+
+  def handle_final_frame(shots, frames)
+    if shots[0].to_i + shots[1].to_i == 10 || shots[0] == 'X'
+      nil
+    else
+      frames << Frame.new(shots)
+      shots.clear
+    end
   end
 
   def print_scores
