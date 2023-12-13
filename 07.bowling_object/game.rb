@@ -4,23 +4,23 @@ require_relative 'frame'
 
 class Game
   def initialize(shots)
-    @shots = shots
+    @frames = group_frames(shots)
   end
 
-  def group_frames
-    shots = []
+  def group_frames(shots)
+    frame_shots = []
     frames = []
-    @shots.each do |s|
+    shots.each do |s|
       if s != 'X'
         s = s.to_i
-        shots << s
-        handle_shot(shots, frames)
+        frame_shots << s
+        handle_shot(frame_shots, frames)
 
-      elsif frames.size == 9 && shots.size <= 2
-        shots << s
-        if shots.size == 3
-          shots << s
-          frames << Frame.new(shots)
+      elsif frames.size == 9 && frame_shots.size <= 2
+        frame_shots << s
+        if frame_shots.size == 3
+          frame_shots << s
+          frames << Frame.new(frame_shots)
         end
       else
         frames << Frame.new([s])
@@ -51,9 +51,9 @@ class Game
 
   def print_scores
     point = 0
-    group_frames.each_with_index do |frame, index|
-      next_frame = group_frames[index + 1]
-      next_next_frame = group_frames[index + 2]
+    @frames.each_with_index do |frame, index|
+      next_frame = @frames[index + 1]
+      next_next_frame = @frames[index + 2]
 
       point += if frame.strike?
                  frame.calculate_strike_score(index, next_frame, next_next_frame)
