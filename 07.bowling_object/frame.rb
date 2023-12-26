@@ -23,23 +23,21 @@ class Frame
     [first_shot.point, second_shot.point, third_shot.point].sum
   end
 
-  def calculate_strike_score(index, next_frame = nil, next_next_frame = nil)
-    if index == 8
-      (next_frame.first_shot.point + next_frame.second_shot.point + score)
-    elsif index == 9
-      score
-    elsif  next_frame.first_shot.point == 10
-      (next_frame.score + next_next_frame.first_shot.point + score)
-    else
-      (next_frame.score + score)
-    end
+  def all_shots
+    [first_shot, second_shot, third_shot]
   end
 
-  def calculate_spare_score(index, next_frame = nil)
-    if index == 9
-      score
-    else
-      (next_frame.first_shot.point + score)
-    end
+  def calculate_strike_score(_index, next_frame = nil, next_next_frame = nil)
+    all_shots_of_next_two_frames = (next_frame&.all_shots || []) + (next_next_frame&.all_shots || [])
+    all_positive_shots = all_shots_of_next_two_frames.select { _1.point.positive? }
+    additional_score = all_positive_shots.slice(0, 2).sum(&:point)
+    10 + additional_score
+  end
+
+  def calculate_spare_score(_index, next_frame = nil)
+    all_shots_of_next_two_frames = (next_frame&.all_shots || []) + (next_next_frame&.all_shots || [])
+    all_positive_shots = all_shots_of_next_two_frames.select { _1.point.positive? }
+    additional_score = all_positive_shots.slice(0, 1).sum(&:point)
+    10 + additional_score
   end
 end
