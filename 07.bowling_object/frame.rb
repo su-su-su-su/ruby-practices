@@ -11,12 +11,14 @@ class Frame
     @third_shot = Shot.new(frame[2])
   end
 
+  DEFEATED_ALL = 10
+
   def strike?
-    @first_shot.point == 10
+    @first_shot.point == DEFEATED_ALL
   end
 
   def spare?
-    !strike? && score == 10
+    !strike? && score == DEFEATED_ALL
   end
 
   def score
@@ -31,13 +33,13 @@ class Frame
     all_shots_of_next_two_frames = (next_frame&.all_shots || []) + (next_next_frame&.all_shots || [])
     all_positive_shots = all_shots_of_next_two_frames.select { _1.point.positive? }
     additional_score = all_positive_shots.slice(0, 2).sum(&:point)
-    10 + additional_score
+    DEFEATED_ALL + additional_score
   end
 
   def calculate_spare_score(_index, next_frame = nil)
     all_shots_of_next_two_frames = (next_frame&.all_shots || []) + (next_next_frame&.all_shots || [])
     all_positive_shots = all_shots_of_next_two_frames.select { _1.point.positive? }
     additional_score = all_positive_shots.slice(0, 1).sum(&:point)
-    10 + additional_score
+    DEFEATED_ALL + additional_score
   end
 end
