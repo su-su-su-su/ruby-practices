@@ -37,7 +37,7 @@ class Frame
   end
 
   def calculate_spare_score(_index, next_frame = nil)
-    all_shots_of_next_two_frames = (next_frame&.all_shots || []) + (next_next_frame&.all_shots || [])
+    all_shots_of_next_two_frames = (next_frame&.all_shots || [])
     all_positive_shots = all_shots_of_next_two_frames.select { _1.point.positive? }
     additional_score = all_positive_shots.slice(0, 1).sum(&:point)
     DEFEATED_ALL + additional_score
