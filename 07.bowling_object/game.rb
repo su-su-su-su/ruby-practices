@@ -31,7 +31,8 @@ class Game
     shots.each_with_index do |shot, index|
       frame_shots << shot
       if frames.size == 9
-        handle_final_frame(frame_shots, frames, index, shots)
+        final_frame = handle_final_frame(frame_shots, index, shots)
+        frames << final_frame if final_frame
         next
       end
       if shot == 'X' || frame_shots.size == 2
@@ -42,8 +43,8 @@ class Game
     frames
   end
 
-  def handle_final_frame(frame_shots, frames, index, shots)
-    frames << Frame.new(frame_shots) if index == shots.size - 1
+  def handle_final_frame(frame_shots, index, shots)
+    return Frame.new(frame_shots) if index == shots.size - 1
   end
 end
 
