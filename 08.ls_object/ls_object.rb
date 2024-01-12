@@ -3,9 +3,9 @@
 
 require 'optparse'
 require 'etc'
+require_relative 'file_info'
 
 class Directory
-
   def initialize(options)
     @options = options
   end
@@ -18,6 +18,27 @@ class Directory
 
     print_files_in_columns(dir)
   end
+
+  def print_file_details(directory)
+    file_details = directory.map do |d|
+      File::Stat.new(d)
+    end
+    files_blocks = file_details.map(&:blocks)
+    puts "total #{files_blocks.sum}"
+    directory.each do |file_path|
+      file_info = FileInfo.new(file_path)
+      print file_info.file_types
+      print file_info.permissions
+      print file_info.nlink.to_s.rjust(2)
+      print Etc.getpwuid(file_info.uid).name.rjust(7)
+      print Etc.getpwuid(file_info.gid).name.rjust(7)
+      print file_info.size.to_s.rjust(5)
+      print file_info.mtime.strftime('%b %e %H:%M').to_s.rjust(13)
+      puts " #{file_path}"
+    end
+  end
+
+  private
 
   def row_legth(directory)
     (directory.size / 3.to_f).ceil # 出力の行数を指定
@@ -37,54 +58,8 @@ class Directory
       puts
     end
   end
-
-  def file_types(file_type)
-    {
-      file: '-',
-      directory: 'd',
-      characterSpecial: 'c',
-      blockSpecial: 'b',
-      fifo: 'p',
-      link: 'l',
-      socket: 's'
-    }[file_type]
-  end
-
-  def permissions(permission)
-    {
-      '0': '---',
-      '1': '--x',
-      '2': '-w-',
-      '3': '-wx',
-      '4': 'r--',
-      '5': 'r-x',
-      '6': 'rw-',
-      '7': 'rwx'
-    }[permission]
-  end
-
-  def print_file_details(directory)
-    file_details = directory.map do |d|
-      File::Stat.new(d)
-    end
-    files_blocks = file_details.map(&:blocks)
-    puts "total #{files_blocks.sum}"
-    directory.each do |x|
-      fs = File::Stat.new(x)
-      fill = fs.mode.to_s(8)
-      print file_types(fs.ftype.to_sym)
-      print permissions(fill[-3].to_sym) + permissions(fill[-2].to_sym) + permissions(fill[-1].to_sym)
-      print fs.nlink.to_s.rjust(2)
-      print Etc.getpwuid(File.stat(x).uid).name.rjust(7)
-      print Etc.getpwuid(File.stat(x).gid).name.rjust(7)
-      print fs.size.to_s.rjust(5)
-      print fs.mtime.strftime('%b %e %H:%M').to_s.rjust(13)
-      puts " #{x}"
-    end
-  end
-
 end
 
 options = ARGV.getopts('alr')
-ls = Directory.new(options)
-ls.print_ls
+directory = Directory.new(options)
+directory.print_ls
