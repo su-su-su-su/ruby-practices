@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 class FileInfo
-  def initialize(file_path)
-    @file_stat = File::Stat.new(file_path)
+  def initialize(list)
+    @file_stat = File::Stat.new(list)
   end
 
   def mode
