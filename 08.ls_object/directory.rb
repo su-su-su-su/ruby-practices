@@ -12,8 +12,10 @@ class Directory
   def print_ls
     lists = Dir.glob('*',  @options['a'] ? File::FNM_DOTMATCH : 0)
     lists = lists.reverse if  @options['r']
-    return print_file_details(lists) if  @options['l']
-
+    if @options['l']
+      print_file_details(lists)
+      return nil
+    end
     print_files_in_columns(lists)
   end
 
