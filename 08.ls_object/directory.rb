@@ -50,8 +50,8 @@ class Directory
 
   def print_files_in_columns(lists)
     name = insert_blank(lists).each_slice(row_length(lists)).to_a
-    name[0].zip(*(name[1..nil])) do |i|
-      print i.join
+    name[0].zip(*(name[1..nil])) do |column|
+      print column.join
       puts
     end
   end
