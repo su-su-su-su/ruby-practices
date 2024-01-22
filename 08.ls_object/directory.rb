@@ -35,21 +35,21 @@ class Directory
     end
   end
 
-  private
-
-  def row_legth(lists)
+  def row_length(lists)
     (lists.size / 3.to_f).ceil # 出力の行数を指定
   end
 
   def insert_blank(lists)
-    directory_max_length = lists.map(&:length).max # ファイルの最大の文字数を出す
-    lists.map do |list|
-      list.ljust(directory_max_length + 10)
-    end
+    rows = lists.each_slice(row_length(lists)).to_a
+    max_length = rows.map { |row| row.map(&:length).max }
+    rows.map.with_index do |row, index|
+      row_max_length = max_length[index]
+      row.map { |file| file.ljust(row_max_length + 2) }
+    end.flatten
   end
 
   def print_files_in_columns(lists)
-    name = insert_blank(lists).each_slice(row_legth(lists)).to_a
+    name = insert_blank(lists).each_slice(row_length(lists)).to_a
     name[0].zip(*(name[1..nil])) do |i|
       print i.join
       puts
