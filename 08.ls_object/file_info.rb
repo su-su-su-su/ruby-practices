@@ -14,7 +14,7 @@ class FileInfo
     'fifo' => 'p',
     'link' => 'l',
     'socket' => 's'
-  }
+  }.freeze
 
   PERMISSIONS = {
     '0' => '---',
@@ -25,12 +25,12 @@ class FileInfo
     '5' => 'r-x',
     '6' => 'rw-',
     '7' => 'rwx'
-  }
+  }.freeze
 
   def name
     @list
   end
-  
+
   def blocks
     @file_stat.blocks
   end
