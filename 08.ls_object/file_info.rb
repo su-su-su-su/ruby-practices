@@ -3,6 +3,15 @@
 class FileInfo
   def initialize(list)
     @file_stat = File::Stat.new(list)
+    @list = list
+  end
+
+  def name
+    @list
+  end
+
+  def blocks
+    @file_stat.blocks
   end
 
   def mode
@@ -14,11 +23,11 @@ class FileInfo
   end
 
   def uid
-    @file_stat.uid
+    Etc.getpwuid(@file_stat.uid).name.rjust(7)
   end
 
   def gid
-    @file_stat.gid
+    Etc.getpwuid(@file_stat.gid).name.rjust(7)
   end
 
   def size

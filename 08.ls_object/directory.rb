@@ -20,21 +20,18 @@ class Directory
   end
 
   def print_file_details(lists)
-    file_details = lists.map do |list|
-      File::Stat.new(list)
-    end
-    files_blocks = file_details.map(&:blocks)
+    file_infos = lists.map { |list| FileInfo.new(list) }
+    files_blocks = file_infos.map(&:blocks)
     puts "total #{files_blocks.sum}"
-    lists.each do |list|
-      file_info = FileInfo.new(list)
+    file_infos.each do |file_info|
       print file_info.file_types
       print file_info.permissions
       print file_info.nlink.to_s.rjust(2)
-      print Etc.getpwuid(file_info.uid).name.rjust(7)
-      print Etc.getpwuid(file_info.gid).name.rjust(7)
+      print file_info.uid
+      print file_info.gid
       print file_info.size.to_s.rjust(5)
-      print file_info.mtime.strftime('%b %e %H:%M').to_s.rjust(13)
-      puts " #{list}"
+      print file_info.mtime.strftime('%b %e %H:%M').rjust(13)
+      puts " #{file_info.name}"
     end
   end
 
