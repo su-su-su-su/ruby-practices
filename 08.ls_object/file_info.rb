@@ -6,10 +6,31 @@ class FileInfo
     @list = list
   end
 
+  FILE_TYPES = {
+    'file' => '-',
+    'directory' => 'd',
+    'characterSpecial' => 'c',
+    'blockSpecial' => 'b',
+    'fifo' => 'p',
+    'link' => 'l',
+    'socket' => 's'
+  }
+
+  PERMISSIONS = {
+    '0' => '---',
+    '1' => '--x',
+    '2' => '-w-',
+    '3' => '-wx',
+    '4' => 'r--',
+    '5' => 'r-x',
+    '6' => 'rw-',
+    '7' => 'rwx'
+  }
+
   def name
     @list
   end
-
+  
   def blocks
     @file_stat.blocks
   end
@@ -39,30 +60,11 @@ class FileInfo
   end
 
   def file_types
-    types = {
-      'file' => '-',
-      'directory' => 'd',
-      'characterSpecial' => 'c',
-      'blockSpecial' => 'b',
-      'fifo' => 'p',
-      'link' => 'l',
-      'socket' => 's'
-    }
-    types[@file_stat.ftype]
+    FILE_TYPES[@file_stat.ftype]
   end
 
   def permissions
-    permissions = {
-      '0' => '---',
-      '1' => '--x',
-      '2' => '-w-',
-      '3' => '-wx',
-      '4' => 'r--',
-      '5' => 'r-x',
-      '6' => 'rw-',
-      '7' => 'rwx'
-    }
     fill = mode.to_s(8)
-    permissions[fill[-3]] + permissions[fill[-2]] + permissions[fill[-1]]
+    PERMISSIONS[fill[-3]] + PERMISSIONS[fill[-2]] + PERMISSIONS[fill[-1]]
   end
 end
