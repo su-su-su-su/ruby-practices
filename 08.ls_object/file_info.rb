@@ -44,11 +44,11 @@ class FileInfo
   end
 
   def uid
-    Etc.getpwuid(@file_stat.uid).name.rjust(7)
+    Etc.getpwuid(@file_stat.uid).name
   end
 
   def gid
-    Etc.getpwuid(@file_stat.gid).name.rjust(7)
+    Etc.getpwuid(@file_stat.gid).name
   end
 
   def size

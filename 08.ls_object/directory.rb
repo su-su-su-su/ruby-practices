@@ -10,8 +10,8 @@ class Directory
   end
 
   def print_ls
-    lists = Dir.glob('*',  @options['a'] ? File::FNM_DOTMATCH : 0)
-    lists = lists.reverse if  @options['r']
+    lists = Dir.glob('*', @options['a'] ? File::FNM_DOTMATCH : 0)
+    lists = lists.reverse if @options['r']
     if @options['l']
       print_file_details(lists)
       return nil
@@ -27,8 +27,8 @@ class Directory
       print file_info.file_types
       print file_info.permissions
       print file_info.nlink.to_s.rjust(2)
-      print file_info.uid
-      print file_info.gid
+      print file_info.uid.rjust(7)
+      print file_info.gid.rjust(7)
       print file_info.size.to_s.rjust(5)
       print file_info.mtime.strftime('%b %e %H:%M').rjust(13)
       puts " #{file_info.name}"
