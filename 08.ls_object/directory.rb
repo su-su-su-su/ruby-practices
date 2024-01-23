@@ -14,7 +14,7 @@ class Directory
     files = files.reverse if @options['r']
     if @options['l']
       print_file_details(files)
-      return nil
+      return
     end
     print_files_in_columns(files)
   end
