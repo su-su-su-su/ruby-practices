@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 class FileInfo
-  def initialize(list)
-    @file_stat = File::Stat.new(list)
-    @list = list
+  def initialize(files)
+    @file_stat = File::Stat.new(files)
+    @files = files
   end
 
   FILE_TYPES = {
@@ -28,7 +28,7 @@ class FileInfo
   }.freeze
 
   def name
-    @list
+    @files
   end
 
   def blocks

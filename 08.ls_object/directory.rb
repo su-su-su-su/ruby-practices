@@ -10,17 +10,19 @@ class Directory
   end
 
   def print_ls
-    lists = Dir.glob('*', @options['a'] ? File::FNM_DOTMATCH : 0)
-    lists = lists.reverse if @options['r']
+    files = Dir.glob('*', @options['a'] ? File::FNM_DOTMATCH : 0)
+    files = files.reverse if @options['r']
     if @options['l']
-      print_file_details(lists)
+      print_file_details(files)
       return nil
     end
-    print_files_in_columns(lists)
+    print_files_in_columns(files)
   end
 
-  def print_file_details(lists)
-    file_infos = lists.map { |list| FileInfo.new(list) }
+  private
+
+  def print_file_details(files)
+    file_infos = files.map { |files| FileInfo.new(files) }
     files_blocks = file_infos.map(&:blocks)
     puts "total #{files_blocks.sum}"
     file_infos.each do |file_info|
@@ -35,12 +37,12 @@ class Directory
     end
   end
 
-  def row_length(lists)
-    (lists.size / 3.to_f).ceil # 出力の行数を指定
+  def row_length(files)
+    (files.size / 3.to_f).ceil # 出力の行数を指定
   end
 
-  def insert_blank(lists)
-    rows = lists.each_slice(row_length(lists)).to_a
+  def insert_blank(files)
+    rows = files.each_slice(row_length(files)).to_a
     max_length = rows.map { |row| row.map(&:length).max }
     rows.map.with_index do |row, index|
       row_max_length = max_length[index]
@@ -48,8 +50,8 @@ class Directory
     end.flatten
   end
 
-  def print_files_in_columns(lists)
-    name = insert_blank(lists).each_slice(row_length(lists)).to_a
+  def print_files_in_columns(files)
+    name = insert_blank(files).each_slice(row_length(files)).to_a
     name[0].zip(*(name[1..nil])) do |column|
       print column.join
       puts
