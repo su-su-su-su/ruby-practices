@@ -22,7 +22,7 @@ class Directory
   private
 
   def print_file_details(files)
-    file_infos = files.map { |files| FileInfo.new(files) }
+    file_infos = files.map { |file| FileInfo.new(file) }
     files_blocks = file_infos.map(&:blocks)
     puts "total #{files_blocks.sum}"
     file_infos.each do |file_info|
